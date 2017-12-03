@@ -1,14 +1,15 @@
 ###############################################################################
-# Dcmģ���makefile�ļ�
-# Author��zhailg117736
-# date��2011-7-8
+# Dcm模块的makefile文件
+# Author：zhailg117736
+# date：2011-7-8
+# modify 2017-12-03
 ###############################################################################
 
 ###############################################################################
-# ָ����Ҫ����ı�ģ��ʵ���ļ���C����CPP�ļ����������ļ���Ŀ���ļ�
+# 指定需要编译的本模块实现文件（C或者CPP文件）、依赖文件和目标文件
 ###############################################################################
 
-# ָ����Ҫ�����CPP�ļ����������ӱ�ģ����������Ŀ¼�µ��ļ�
+# 指定需要编译的CPP文件：依次添加本模块下所有子目录下的文件
 _RNLC_Mesh_All_C += $(wildcard $(_RNLC_MESH_SOURCE_PATH_LTE)/rrd/*.c)
 _RNLC_Mesh_All_C += $(wildcard $(_RNLC_MESH_SOURCE_PATH_LTE)/main/source/*.c)
 _RNLC_Mesh_All_C += $(wildcard $(_RNLC_MESH_SOURCE_PATH_LTE)/olsrd/comm/source/*.c)
@@ -17,22 +18,22 @@ _RNLC_Mesh_All_C += $(wildcard $(_RNLC_MESH_SOURCE_PATH_LTE)/olsrd/lq/source/*.c
 _RNLC_Mesh_All_C += $(wildcard $(_RNLC_MESH_SOURCE_PATH_LTE)/olsrd/extern/source/*.c)
 
 
-# ָ����Ҫ����������ļ�����Ӧ������Ҫ�����C�ļ�����CPP�ļ�
+# 指定需要编译的依赖文件：对应所有需要编译的C文件或者CPP文件
 _RNLC_Mesh_All_Depend += $(addprefix $(_RNLC_MESH_DEPEND_PATH_LTE)/, $(subst .c,.d,$(notdir $(_RNLC_Mesh_All_C))))
 
-# ָ����Ҫ����.o�ļ�������·��������Ӧ������Ҫ�����C�ļ�����CPP�ļ�
+# 指定需要编译.o文件名（含路径）：对应所有需要编译的C文件或者CPP文件
 _RNLC_Mesh_All_O += $(addprefix $(_LTE_RNLC_TEMP_PATH)/, $(subst .c,.o,$(notdir $(_RNLC_Mesh_All_C))))
 
 ###############################################################################
-# ����ģ��Ŀ���ļ����ӵ���ϵͳĿ���ļ��б�
+# 将本模块目标文件添加到子系统目标文件列表
 ###############################################################################
 _RNLC_All_Objects += $(_RNLC_Mesh_All_O)
 
 ###############################################################################
-# ���ɱ�ģ�������ļ�
+# 生成本模块依赖文件
 ###############################################################################
 
-# �������ɱ�ģ�������ļ�ʹ�õı���ѡ��
+# 定义生成本模块依赖文件使用的编译选项
 MESH_SELF_PATH = -D__linux__
 MESH_SELF_PATH += $(addprefix -I,$(_RNLC_MESH_SOURCE_PATH_LTE)/rrd) \
                  $(addprefix -I,$(_RNLC_MESH_SOURCE_PATH_LTE)/main/include) \
@@ -43,7 +44,7 @@ MESH_SELF_PATH += $(addprefix -I,$(_RNLC_MESH_SOURCE_PATH_LTE)/rrd) \
                  
 MESH_DEPCFLAGS = $(RNLC_DEPCFLAGS) $(MESH_SELF_PATH)
 
-# �������ɱ�ģ�������ļ�����������
+# 定义生成本模块依赖文件的命令序列
 define mesh_make_d
 @if not exist $(_RNLC_MESH_DEPEND_PATH_LTE) $(MKDIR) $(subst /,\,$(_RNLC_MESH_DEPEND_PATH_LTE))
 @$(ECHO) Making $@ ......
@@ -53,7 +54,7 @@ define mesh_make_d
 @$(ECHO) Done!
 endef
 
-# �������ɱ�ģ�������ļ��Ĺ������ζ���ÿ����Ŀ¼ʵ���ļ������ɹ���
+# 定义生成本模块依赖文件的规则：依次定义每个子目录实现文件的生成规则
 $(_RNLC_MESH_DEPEND_PATH_LTE)/%.d : $(_RNLC_MESH_SOURCE_PATH_LTE)/rrd/%.c
 	$(mesh_make_d)
 
@@ -74,16 +75,16 @@ $(_RNLC_MESH_DEPEND_PATH_LTE)/%.d : $(_RNLC_MESH_SOURCE_PATH_LTE)/olsrd/extern/s
 
 
 ###############################################################################
-# ���ɱ�ģ��Ŀ���ļ�
+# 生成本模块目标文件
 ###############################################################################
 
-# �������ɱ�ģ�������ļ�ʹ�õı���ѡ��
+# 定义生成本模块依赖文件使用的编译选项
 
 MESH_CFLAGS = $(filter-out -Wno-deprecated, $(RNLC_CFLAGS) $(MESH_SELF_PATH))
 
-# �������ɱ�ģ��Ŀ���ļ�����������
+# 定义生成本模块目标文件的命令序列
 define mesh_make_o
-@echo ��ʼ����$<
+@echo 开始编译$<
 @if not exist $(_LTE_RNLC_OBJ_PATH) $(MKDIR) $(subst /,\,$(_LTE_RNLC_OBJ_PATH))
 @if not exist $(_LTE_RNLC_TEMP_PATH) $(MKDIR) $(subst /,\,$(_LTE_RNLC_TEMP_PATH))
 @$(ECHO) Making $@ ......
@@ -91,7 +92,7 @@ define mesh_make_o
 @$(ECHO) Done!
 endef
 
-# �������ɱ�ģ��Ŀ���ļ��Ĺ������ζ���ÿ����Ŀ¼ʵ���ļ������ɹ���
+# 定义生成本模块目标文件的规则：依次定义每个子目录实现文件的生成规则
 $(_LTE_RNLC_TEMP_PATH)/%.o : $(_RNLC_MESH_SOURCE_PATH_LTE)/rrd/%.c
 	$(mesh_make_o)
 
@@ -113,26 +114,26 @@ $(_LTE_RNLC_TEMP_PATH)/%.o : $(_RNLC_MESH_SOURCE_PATH_LTE)/olsrd/extern/source/%
 
 
 ###############################################################################
-# ��ģ��Lint���
+# 本模块Lint检查
 ###############################################################################
 
-# ���屾ģ��lint����ʱĿ¼
+# 定义本模块lint的临时目录
 _RNLC_MESH_TEMP_LINT_PATH = $(_RNLC_TEMP_LINT_PATH_LTE)/mesh
 _RNLC_MESH_RESULT_LINT_PATH_LTE = $(_RNLC_RESULT_LINT_PATH_LTE)/mesh
 
-# ���屾ģ���Lob�ļ�
+# 定义本模块的Lob文件
 _RNLC_Mesh_Lint_Obj = $(_RNLC_MESH_TEMP_LINT_PATH)/_RNLC_Mesh_Obj.lob
 
-# ���屾ģ���Lob�ļ��б�
+# 定义本模块的Lob文件列表
 _RNLC_Mesh_All_Lint_Objects += $(addprefix $(_RNLC_MESH_TEMP_LINT_PATH)/, $(subst .c,.lob,$(notdir $(_RNLC_Mesh_All_CPP))))
 
-# ����ģ���Lob�ļ��б����뵽��ϵͳ��Lob�ļ��б���
+# 将本模块的Lob文件列表加入到子系统的Lob文件列表中
 _Rnlc_All_Lint_Objects += $(_RNLC_Mesh_Lint_Obj)
 
 
-# ���屾ģ��lint����
+# 定义本模块lint操作
 define mesh_lint
-@echo ��ʼLint $<
+@echo 开始Lint $<
 @if not exist $(_RNLC_MESH_TEMP_LINT_PATH) $(MKDIR) $(subst /,\,$(_RNLC_MESH_TEMP_LINT_PATH))
 @if not exist $(_RNLC_MESH_RESULT_LINT_PATH_LTE) $(MKDIR) $(subst /,\,$(_RNLC_MESH_RESULT_LINT_PATH_LTE))
 $(ECHO) Linting $@ ......
@@ -142,10 +143,10 @@ $(ECHO) Linting $@ ......
 endef
 
 $(_RNLC_Mesh_Lint_Obj): $(_RNLC_Mesh_All_Lint_Objects)
-	@echo ��ʼ ---- $@
+	@echo 开始 ---- $@
 	@if not exist $(_RNLC_MESH_TEMP_LINT_PATH) $(MKDIR) $(subst /,\,$(_RNLC_MESH_TEMP_LINT_PATH))
 	@$(LINT) $(LINTOPTION) $+ -oo($@)
-	@echo �������Ϊ$@
+	@echo 输出内容为$@
 
 
 $(_RNLC_MESH_TEMP_LINT_PATH)/%.lob : $(_RNLC_MESH_SOURCE_PATH_LTE)/rrd/%.c
@@ -168,7 +169,7 @@ $(_RNLC_MESH_TEMP_LINT_PATH)/%.lob : $(_RNLC_MESH_SOURCE_PATH_LTE)/olsrd/extern/
 
 
 ###############################################################################
-# ������ģ�����ɵ�.d�ļ�
+# 包含本模块生成的.d文件
 ###############################################################################
 
 ifeq (, $(_PLAT_DISABLE_DEPEND))
